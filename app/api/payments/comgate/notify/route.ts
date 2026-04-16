@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { verifyComgateNotification } from "@/lib/comgate";
+import { setPaymentStatus } from "@/lib/payment-store";
 
 /**
  * POST /api/payments/comgate/notify
@@ -32,8 +33,8 @@ export async function POST(request: Request) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  // TODO: persist the status change (e.g. update an order in a database).
-  // At minimum, log the event so operators can observe payment lifecycle.
+  // Persist the status so the result page can poll for it.
+  setPaymentStatus(notification.transId, notification.status);
   console.log(
     `[comgate/notify] transId=${notification.transId} status=${notification.status} refId=${notification.refId} price=${notification.price} ${notification.curr}`,
   );

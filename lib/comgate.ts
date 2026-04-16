@@ -8,6 +8,9 @@ const COMGATE_LABEL = process.env.COMGATE_LABEL ?? "In-store payment";
 const COMGATE_LANG = process.env.COMGATE_LANG ?? "cs";
 const COMGATE_METHOD = process.env.COMGATE_METHOD ?? "BANK_ALL";
 
+/** Base URL of this application, used to build return URLs for Comgate. */
+const APP_URL = (process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
+
 export type ComgateCreatePaymentResult = {
   code?: string | number;
   message?: string;
@@ -132,6 +135,8 @@ export const createComgatePayment = async (
     method: COMGATE_METHOD,
     lang: COMGATE_LANG,
     refId: crypto.randomUUID(),
+    urlOk: `${APP_URL}/payment/result`,
+    urlCancel: `${APP_URL}/payment/result`,
   });
 
   const response = await fetch(COMGATE_CREATE_PAYMENT_URL, {
