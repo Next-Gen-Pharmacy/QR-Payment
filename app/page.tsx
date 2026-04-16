@@ -101,8 +101,13 @@ export default function Home() {
                   <Alert variant="success" className="mt-4 mb-0">
                     <div className="fw-semibold">Payment initialized.</div>
                     {result.transactionId && <div>Transaction ID: {result.transactionId}</div>}
-                    <a href={result.paymentUrl} target="_blank" rel="noopener noreferrer">
-                      Open customer payment page
+                    <a
+                      href={result.paymentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Open customer payment page in a new tab"
+                    >
+                      Open customer payment page (opens in new tab)
                     </a>
                   </Alert>
                 )}

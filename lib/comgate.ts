@@ -35,10 +35,12 @@ export const createComgatePayment = async (
   payload: ComgatePayload,
 ): Promise<ComgateCreatePaymentResult> => {
   if (!COMGATE_MERCHANT || !COMGATE_SECRET) {
-    throw new Error("Comgate credentials are not configured.");
+    throw new Error(
+      "Comgate credentials are not configured. Please set COMGATE_MERCHANT and COMGATE_SECRET.",
+    );
   }
 
-  const amountInHellers = Math.round(payload.amountCzk * 100);
+  const amountInHellers = Math.round((payload.amountCzk + Number.EPSILON) * 100);
   const body = new URLSearchParams({
     merchant: COMGATE_MERCHANT,
     secret: COMGATE_SECRET,

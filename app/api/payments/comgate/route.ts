@@ -15,7 +15,14 @@ export async function POST(request: Request) {
 
   if (!Number.isFinite(amountCzk) || amountCzk <= 0 || amountCzk > MAX_CZK_AMOUNT) {
     return NextResponse.json(
-      { message: `Amount must be between 0 and ${MAX_CZK_AMOUNT} CZK.` },
+      { message: `Amount must be greater than 0 and at most ${MAX_CZK_AMOUNT} CZK.` },
+      { status: 400 },
+    );
+  }
+
+  if (!Number.isInteger((amountCzk + Number.EPSILON) * 100)) {
+    return NextResponse.json(
+      { message: "Amount can have at most two decimal places." },
       { status: 400 },
     );
   }
