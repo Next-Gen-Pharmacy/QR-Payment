@@ -20,15 +20,8 @@ type ComgatePayload = {
 };
 
 const parseComgateResponse = (raw: string): ComgateCreatePaymentResult => {
-  try {
-    return JSON.parse(raw) as ComgateCreatePaymentResult;
-  } catch {
-    const keyValues = raw
-      .split("&")
-      .map((segment) => segment.split("="))
-      .filter(([key]) => Boolean(key));
-    return Object.fromEntries(keyValues) as ComgateCreatePaymentResult;
-  }
+  const params = new URLSearchParams(raw);
+  return Object.fromEntries(params.entries()) as ComgateCreatePaymentResult;
 };
 
 export const createComgatePayment = async (
@@ -50,7 +43,6 @@ export const createComgatePayment = async (
     method: COMGATE_METHOD,
     lang: COMGATE_LANG,
     refId: crypto.randomUUID(),
-    prepareOnly: "true",
   });
 
   const response = await fetch(COMGATE_CREATE_PAYMENT_URL, {
