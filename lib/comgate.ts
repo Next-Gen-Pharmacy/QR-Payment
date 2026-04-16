@@ -15,6 +15,95 @@ export type ComgateCreatePaymentResult = {
   redirect?: string;
 };
 
+export type ComgatePaymentStatus = "PAID" | "CANCELLED" | "PENDING" | "AUTHORIZED";
+
+export type ComgateNotification = {
+  merchant: string;
+  secret: string;
+  transId: string;
+  status: ComgatePaymentStatus;
+  price: string;
+  curr: string;
+  refId: string;
+  email?: string;
+  test?: string;
+  fee?: string;
+  label?: string;
+  method?: string;
+  account?: string;
+  phone?: string;
+  name?: string;
+  lang?: string;
+  prepareOnly?: string;
+  preauth?: string;
+  initRecurring?: string;
+  verification?: string;
+  payerId?: string;
+  payerName?: string;
+  payerAccountName?: string;
+  exId?: string;
+  exUrl?: string;
+};
+
+/**
+ * Parses and validates an incoming Comgate push-notification request body.
+ *
+ * Returns the parsed notification when the `merchant` and `secret` fields
+ * match the configured credentials, or `null` when validation fails.
+ */
+export const verifyComgateNotification = (
+  body: URLSearchParams,
+): ComgateNotification | null => {
+  if (!COMGATE_MERCHANT || !COMGATE_SECRET) {
+    return null;
+  }
+
+  const merchant = body.get("merchant");
+  const secret = body.get("secret");
+  const transId = body.get("transId");
+  const status = body.get("status") as ComgatePaymentStatus | null;
+  const price = body.get("price");
+  const curr = body.get("curr");
+  const refId = body.get("refId");
+
+  if (
+    merchant !== COMGATE_MERCHANT ||
+    secret !== COMGATE_SECRET ||
+    !transId ||
+    !status ||
+    !price ||
+    !curr ||
+    !refId
+  ) {
+    return null;
+  }
+
+  const notification: ComgateNotification = {
+    merchant,
+    secret,
+    transId,
+    status,
+    price,
+    curr,
+    refId,
+  };
+
+  const optional = [
+    "email", "test", "fee", "label", "method", "account", "phone", "name",
+    "lang", "prepareOnly", "preauth", "initRecurring", "verification",
+    "payerId", "payerName", "payerAccountName", "exId", "exUrl",
+  ] as const;
+
+  for (const key of optional) {
+    const value = body.get(key);
+    if (value !== null) {
+      (notification as Record<string, string>)[key] = value;
+    }
+  }
+
+  return notification;
+};
+
 type ComgatePayload = {
   amountCzk: number;
 };
